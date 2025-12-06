@@ -1,92 +1,97 @@
 # bible.com scraper
 
-THIS ONLY WORKS WITH Python 3.9
+Download Bible translations from bible.com (YouVersion) to JSON and XML formats.
 
-NOTE:
+**Requires Python 3.9**
 
-- Thanks to @mightmay for this cool project!
-- I am new to Python and Git, and I am still learning (My first commit & pull 🤗). If you have any suggestions or corrections, please let me know.
-- I am using MacOS and Python 3.11.2. If you are using a different OS or Python version, please modify the code to fit your requirements.
-- An idea I could not implement was to create a script to automate the whole process from steps 5 to 7: receive variables (bible version ID, bible version abbreviation, output filename), run scrapy, run pip install xmltodict, and convert JSON file to XML. Maybe in future updates.
+## Quick Start
 
-## Configuring environment and running the project
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/isaacgounton/youversion-bible.com-downloader.git
+   cd youversion-bible.com-downloader
+   ```
 
-To run the project, follow these steps:
+2. **Create and activate virtual environment with Python 3.9**:
+   ```bash
+   python3.9 -m venv venv
+   source venv/bin/activate
+   ```
 
-1. **Fork/Clone the repository**:
+3. **Install requirements**:
+   ```bash
+   pip install -r requirements.txt
+   pip install xmltodict
+   ```
 
-   - Run the following command in your terminal: `git clone https://github.com/jerryagenyi/youversion-bible.com-downloader-json2xml.git`
+4. **Configure the Bible version** in `config.json`:
+   ```json
+   {
+       "bible_id": 2405,
+       "bible_name": "BWL23",
+       "bible_url": "https://www.bible.com/bible/2405/",
+       "start_book": "GEN",
+       "start_chapter": 1
+   }
+   ```
+   
+   - `bible_id`: The ID from the Bible.com URL (e.g., `https://www.bible.com/bible/2405/` → `2405`)
+   - `bible_name`: Name/abbreviation for the XML output
+   - `start_book`: Starting book code (default: "GEN")
+   - `start_chapter`: Starting chapter (default: 1)
 
-2. **Create new virtual environment**:
+5. **Run the scraper**:
+   ```bash
+   scrapy crawl bible
+   ```
 
-   - Run the following command in your terminal:
-     ```bash
-     python -m venv venv
-     ```
-     OR, using Conda:
-     ```bash
-     conda create --name bible-dot-com-downloader python=3
-     ```
+6. **Convert JSON to XML**:
+   ```bash
+   cd bible/data
+   python generate_xml.py
+   ```
 
-3. **Activate virtual environment**:
+## Output Files
 
-   - Run the following command in your terminal:
-     ```bash
-     source venv/bin/activate
-     ```
-     OR, using Conda:
-     ```bash
-     source activate bible-scraper
-     ```
+The downloaded files are saved in `bible/data/`:
+- `spider.bible_id.json` - JSON format
+- `spider.bible_id.xml` - XML format
 
-4. **CD to bible folder and Install requirements**:
-
-   - Run the following command in your terminal:
-     ```bash
-     cd bible
-     pip install -r requirements.txt
-     ```
-
-5. **Next run "scrapy crawl bible"**:
-
-   - Run the following command in your terminal:
-     ```bash
-     scrapy crawl bible
-     ```
-
-6. **Install xmltodict**:
-
-   - Run the following command in your terminal:
-     ```bash
-     pip install xmltodict
-     ```
-
-7. **CD to bible/data folder and run the 'generate_xml.py' file**:
-   - Run the following command in your terminal:
-     ```bash
-     cd bible/data
-     python generate_xml.py
-     ```
-
-## Notes
-
-- The downloaded json file will be in `\bible\data`
-- JSON file structure (this is just an example, your .json file will not be in this order):
-
-  ```json
-  JList
-  [
-    {"BookName":
-      {"ChapterNumber":
-        {"VerseNumber":"Verse String"}
-
-        ...
-      }
+### JSON Structure
+```json
+{
+  "BookName": {
+    "ChapterNumber": {
+      "VerseNumber": "Verse text..."
     }
-  ]
-  ```
+  }
+}
+```
 
-- **REMEMBER:**
-  - Get Bible version IDs from www.bible.com (i.e. NIV version ID is 59: https://www.bible.com/bible/59/GEN.1.ESV)
-  - Don't forget to change the Bible Version abbreviation in line 9 of generate_xml.py when declaring the dictionary (i.e. @biblename": "TPT", to @biblename": "IUMN" or @biblename": "ARA" etc).
-  - The JSON and XML files generated (spider.bible_id.json and spider.bible_id.xml) are in `\bible\data`.
+### XML Structure
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<XMLBIBLE biblename="BWL23">
+  <BIBLEBOOK bnumber="1" bname="Genesis">
+    <CHAPTER cnumber="1">
+      <VERS vnumber="1">In the beginning...</VERS>
+    </CHAPTER>
+  </BIBLEBOOK>
+</XMLBIBLE>
+```
+
+## Finding Bible Version IDs
+
+1. Go to [bible.com](https://www.bible.com/bible/)
+2. Select your desired Bible translation
+3. The ID is in the URL: `https://www.bible.com/bible/[ID]/GEN.1`
+
+Example IDs:
+- ESV: 59
+- NIV: 111
+- Gun (BWL23): 2405
+
+## Credits
+
+- Original project by [@mightmay](https://github.com/mightmay)
+- JSON to XML conversion and improvements by contributors

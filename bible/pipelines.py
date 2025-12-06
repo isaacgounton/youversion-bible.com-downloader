@@ -1,31 +1,28 @@
-import datetime
-from scrapy import signals
-from scrapy.exporters import JsonItemExporter
+import json
+import os
 
 
 class BiblePipeline(object):
 
     def __init__(self):
-        self.files = {}
+        self.file = None
 
-    @classmethod
-    def from_crawler(cls, crawler):
-        pipeline = cls()
-        crawler.signals.connect(pipeline.spider_opened, signals.spider_opened)
-        crawler.signals.connect(pipeline.spider_closed, signals.spider_closed)
-        return pipeline
+    def open_spider(self, spider):
+        # Get the directory where this file is located (bible/)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(base_dir, 'data')
+        
+        # Ensure data directory exists
+        os.makedirs(data_dir, exist_ok=True)
+        
+        output_path = os.path.join(data_dir, 'spider.bible_id.json')
+        self.file = open(output_path, 'w', encoding='utf-8')
 
-    def spider_opened(self, spider):
-        file = open("data/"+"spider.bible_id"+".json", 'w+b')
-        self.files[spider] = file
-        self.exporter = JsonItemExporter(file)
-        self.exporter.start_exporting()
-
-    def spider_closed(self, spider):
-        self.exporter.finish_exporting()
-        file = self.files.pop(spider)
-        file.close()
+    def close_spider(self, spider):
+        if self.file:
+            self.file.close()
 
     def process_item(self, item, spider):
-        self.exporter.export_item(item)
+        # Write the item as JSON
+        json.dump(item, self.file, ensure_ascii=False, indent=2)
         return item

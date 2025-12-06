@@ -1,4 +1,5 @@
 import json
+import os
 import scrapy
 
 class BibleSpider(scrapy.Spider):
@@ -9,12 +10,18 @@ class BibleSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-		# change the language version number the three following line
-		# Iu Mien New Roman: 233 ARA: 1608
-        self.bible_id = 59
-        self.base_url = "https://events.bible.com/api/bible/chapter/3.1?id=59&reference="
+        # Load configuration from config.json
+        config_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.json')
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        
+        self.bible_id = config['bible_id']
+        start_book = config.get('start_book', 'GEN')
+        start_chapter = config.get('start_chapter', 1)
+        
+        self.base_url = f"https://events.bible.com/api/bible/chapter/3.1?id={self.bible_id}&reference="
         self.start_urls = [
-            'https://events.bible.com/api/bible/chapter/3.1?id=59&reference=GEN.1'
+            f'https://events.bible.com/api/bible/chapter/3.1?id={self.bible_id}&reference={start_book}.{start_chapter}'
         ]
 
     def parse(self, response):
