@@ -1,6 +1,6 @@
 BOT_NAME = 'bible'
 
-SPIDER_MODULES = ['bible.spiders.spider']
+SPIDER_MODULES = ['bible.spiders.spider', 'bible.spiders.audio_spider']
 NEWSPIDER_MODULE = 'bible.spiders'
 
 LOG_ENABLED = True

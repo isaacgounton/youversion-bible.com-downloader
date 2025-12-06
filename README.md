@@ -40,7 +40,7 @@ Download Bible translations from bible.com (YouVersion) to JSON and XML formats.
    - `start_book`: Starting book code (default: "GEN")
    - `start_chapter`: Starting chapter (default: 1)
 
-5. **Run the scraper**:
+5. **Run the text scraper**:
    ```bash
    scrapy crawl bible
    ```
@@ -51,11 +51,17 @@ Download Bible translations from bible.com (YouVersion) to JSON and XML formats.
    python generate_xml.py
    ```
 
+7. **Download audio files** (optional):
+   ```bash
+   scrapy crawl bible_audio
+   ```
+
 ## Output Files
 
 The downloaded files are saved in `bible/data/`:
-- `spider.bible_id.json` - JSON format
-- `spider.bible_id.xml` - XML format
+- `spider.bible_id.json` - JSON format (text)
+- `spider.bible_id.xml` - XML format (text)
+- `audio/{bible_name}/` - Audio MP3 files (e.g., `audio/BWL23/GEN_1.mp3`)
 
 ### JSON Structure
 ```json
